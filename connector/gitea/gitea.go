@@ -319,7 +319,6 @@ func (c *giteaConnector) groupsForOrgs(ctx context.Context, client *http.Client)
 		return []string{}, fmt.Errorf("gitea: User does not belong to any of the approved groups")
 	}
 	return filteredGroups, nil
-
 }
 
 type organization struct {
@@ -334,13 +333,13 @@ type team struct {
 }
 
 func (c *giteaConnector) userGroups(ctx context.Context, client *http.Client) ([]string, error) {
-	apiUrl := c.baseURL + "/api/v1/user/teams"
+	apiURL := c.baseURL + "/api/v1/user/teams"
 	groups := make([]string, 0)
 	page := 1
 	limit := 20
 	for {
 		var teams []team
-		req, err := http.NewRequest("GET", fmt.Sprintf("%s?page=%d&limit=%d", apiUrl, page, limit), nil)
+		req, err := http.NewRequest("GET", fmt.Sprintf("%s?page=%d&limit=%d", apiURL, page, limit), nil)
 		if err != nil {
 			return groups, fmt.Errorf("gitea: new req: %v", err)
 		}
@@ -373,7 +372,7 @@ func (c *giteaConnector) userGroups(ctx context.Context, client *http.Client) ([
 			groups = append(groups, formatTeamName(t.Organization.Name, t.Name))
 		}
 
-		page = page + 1
+		page++
 	}
 
 	// remove dupelicate slice variables
