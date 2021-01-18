@@ -18,19 +18,39 @@ export GOBIN=$(PWD)/bin
 LD_FLAGS="-w -X $(REPO_PATH)/version.Version=$(VERSION)"
 
 # Dependency versions
-GOLANGCI_VERSION = 1.21.0
+GOLANGCI_VERSION = 1.32.2
 
-build: bin/dex bin/grpc-client
+build: bin/dex
 
 bin/dex:
+	@mkdir -p bin/
 	@go install -v -ldflags $(LD_FLAGS) $(REPO_PATH)/cmd/dex
 
+examples: bin/grpc-client bin/example-app
+
 bin/grpc-client:
-	@go install -v -ldflags $(LD_FLAGS) $(REPO_PATH)/examples/grpc-client
+	@mkdir -p bin/
+	@cd examples/ && go install -v -ldflags $(LD_FLAGS) $(REPO_PATH)/examples/grpc-client
+
+bin/example-app:
+	@mkdir -p bin/
+	@cd examples/ && go install -v -ldflags $(LD_FLAGS) $(REPO_PATH)/examples/example-app
 
 .PHONY: release-binary
 release-binary:
 	@go build -o /go/bin/dex -v -ldflags $(LD_FLAGS) $(REPO_PATH)/cmd/dex
+
+docker-compose.override.yaml:
+	cp docker-compose.override.yaml.dist docker-compose.override.yaml
+
+.PHONY: up
+up: docker-compose.override.yaml ## Launch the development environment
+	@ if [ docker-compose.override.yaml -ot docker-compose.override.yaml.dist ]; then diff -u docker-compose.override.yaml docker-compose.override.yaml.dist || (echo "!!! The distributed docker-compose.override.yaml example changed. Please update your file accordingly (or at least touch it). !!!" && false); fi
+	docker-compose up -d
+
+.PHONY: down
+down: clear ## Destroy the development environment
+	docker-compose down --volumes --remove-orphans --rmi local
 
 test: bin/test/kube-apiserver bin/test/etcd
 	@go test -v ./...

@@ -6,7 +6,7 @@ issuer: http://127.0.0.1:5556/dex
 # The storage configuration determines where dex stores its state. Supported
 # options include SQL flavors and Kubernetes third party resources.
 #
-# See the storage document at Documentation/storage.md for further information.
+# See the documentation (https://dexidp.io/docs/storage/) for further information.
 storage:
   type: sqlite3
   config:
@@ -50,6 +50,13 @@ web:
   # tlsCert: /etc/dex/tls.crt
   # tlsKey: /etc/dex/tls.key
 
+# Configuration for dex appearance
+# frontend:
+#   issuer: dex
+#   logoURL: theme/logo.png
+#   dir: web/
+#   theme: light
+
 # Configuration for telemetry
 telemetry:
   http: 0.0.0.0:5558
@@ -58,12 +65,13 @@ telemetry:
 # from the HTTP endpoints.
 # grpc:
 #   addr: 127.0.0.1:5557
-#  tlsCert: examples/grpc-client/server.crt
-#  tlsKey: examples/grpc-client/server.key
-#  tlsClientCA: /etc/dex/client.crt
+#   tlsCert: examples/grpc-client/server.crt
+#   tlsKey: examples/grpc-client/server.key
+#   tlsClientCA: examples/grpc-client/ca.crt
 
 # Uncomment this block to enable configuration for the expiration time durations.
 # expiry:
+#   deviceRequests: "5m"
 #   signingKeys: "6h"
 #   idTokens: "24h"
 
@@ -83,7 +91,7 @@ telemetry:
     # go directly to it. For connected IdPs, this redirects the browser away
     # from application to upstream provider such as the Google login page
 #   alwaysShowLoginScreen: false
-    # Uncommend the passwordConnector to use a specific connector for password grants
+    # Uncomment the passwordConnector to use a specific connector for password grants
 #   passwordConnector: local
 
 # Instead of reading from an external storage, use this list of clients.
@@ -95,7 +103,11 @@ staticClients:
   - 'http://127.0.0.1:5555/callback'
   name: 'Example App'
   secret: ZXhhbXBsZS1hcHAtc2VjcmV0
-
+#  - id: example-device-client
+#    redirectURIs:
+#      - /device/callback
+#    name: 'Static Client for Device Flow'
+#    public: true
 connectors:
 - type: mockCallback
   id: mock
