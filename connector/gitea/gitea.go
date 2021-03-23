@@ -163,7 +163,7 @@ func (c *giteaConnector) HandleCallback(s connector.Scopes, r *http.Request) (id
 	}
 
 	// Only set identity.Groups if 'orgs', 'org', or 'groups' scope are specified.
-	if c.groupsRequired(s.Groups) {
+	if c.groupsRequired() {
 		groups, err := c.getGroups(ctx, client)
 		if err != nil {
 			return identity, err
@@ -263,7 +263,7 @@ func (c *giteaConnector) Refresh(ctx context.Context, s connector.Scopes, ident 
 	ident.Email = user.Email
 
 	// Only set identity.Groups if 'orgs', 'org', or 'groups' scope are specified.
-	if c.groupsRequired(s.Groups) {
+	if c.groupsRequired() {
 		groups, err := c.getGroups(ctx, client)
 		if err != nil {
 			return ident, err
@@ -421,6 +421,6 @@ func (c *giteaConnector) user(ctx context.Context, client *http.Client) (giteaUs
 // groupsRequired returns whether dex requires GitHub's 'read:org' scope. Dex
 // needs 'read:org' if 'orgs' or 'org' fields are populated in a config file.
 // Clients can require 'groups' scope without setting 'orgs'/'org'.
-func (c *giteaConnector) groupsRequired(groupScope bool) bool {
+func (c *giteaConnector) groupsRequired() bool {
 	return len(c.orgs) > 0 || c.loadAllGroups
 }
